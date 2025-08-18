@@ -1,20 +1,56 @@
 "use client";
 
-import { taskAtom } from "@/store/store";
-import { useAtom } from "jotai";
+import { createTask } from "@/api/data";
+import { taskAtom, tasksAtom } from "@/store/store";
+import { useAtom, useSetAtom } from "jotai";
+import { useState } from "react";
+
+interface TASK {
+  id: number;
+  task: string;
+  isCompleted: boolean;
+}
 
 const NewTask = () => {
-  const [taskBooleanAtom, setTaskBooleanAtom] = useAtom(taskAtom);
+  const [task, setTask] = useState<string>("");
+  const setTaskAtom = useSetAtom(taskAtom);
+  const [tasks, setNewTask] = useAtom<TASK[]>(tasksAtom);
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const data = { task: task };
+      const response = await createTask(data);
+      if (response) {
+        setTaskAtom(false);
+        const newTask = {
+          id: response.data.id,
+          task: response.data.task,
+          isCompleted: response.data.isCompleted,
+        };
+        const newTaskArray = [...tasks, newTask];
+        setNewTask(newTaskArray);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <div className="fixed top-0 z-10 w-[500px] h-[500px] bg-white rounded">
-      <button
-        className="cursor-pointer"
-        onClick={() => {
-          setTaskBooleanAtom(false);
-        }}
-      >
-        Cerrar
-      </button>
+    <div className="fixed z-20 bg-white rounded">
+      <form onSubmit={handleCreateTask}>
+        <input
+          type="text"
+          className="p-3 min-w-[500px]"
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+        />
+        <button
+          type="submit"
+          className="cursor-pointer px-2 border-l font-bold text-green-700"
+        >
+          Crear
+        </button>
+      </form>
     </div>
   );
 };
