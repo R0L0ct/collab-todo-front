@@ -61,6 +61,7 @@ const Todo = () => {
       )}
       <div className="font-bold text-[#F4F6F7] flex justify-center py-5">
         <button
+          name="Nueva Tarea"
           onClick={() => setTaskBooleanAtom(true)}
           className="bg-orange-700 hover:bg-orange-600 rounded-md p-2 cursor-pointer"
         >
