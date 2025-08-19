@@ -45,7 +45,7 @@ const NewTask = () => {
           onChange={(e) => setTask(e.target.value)}
         />
         <button
-          name="Crear"
+          data-testid="create-task-button"
           type="submit"
           className="cursor-pointer px-2 border-l font-bold text-green-700"
         >
