@@ -1,9 +1,9 @@
 "use client";
 
-import { getTasks, updateTask } from "@/api/data";
+import { deleteTask, getTasks, updateTask } from "@/api/data";
 import { taskAtom, tasksAtom } from "@/store/store";
 import { useAtom } from "jotai";
-import { Check, Square } from "lucide-react";
+import { Check, Square, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import NewTask from "./NewTask";
 
@@ -48,6 +48,16 @@ const Todo = () => {
     }
   };
 
+  const handleRemove = async (id: number) => {
+    try {
+      await deleteTask(id);
+      const filteredTasks = tasks.filter((t) => t.id !== id);
+      setTasks(filteredTasks);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="p-5 rounded min-w-[800px] flex items-center flex-col">
       {taskBooleanAtom && (
@@ -68,34 +78,47 @@ const Todo = () => {
           Nueva Tarea
         </button>
       </div>
-      <div className="w-full flex flex-col gap-2 h-[600px] overflow-y-scroll px-5">
-        {tasks &&
-          tasks.map((t) => {
+      {tasks.length > 0 ? (
+        <div className="w-full flex flex-col gap-2 h-[600px] overflow-y-scroll px-5">
+          {tasks.map((t, index) => {
             return (
               <div
                 key={t.id}
                 className="text-[#F4F6F7] flex justify-between w-full border rounded p-3"
               >
-                <div className="font-bold text-[#FF69B4]">{t.id}</div>
+                <div className="font-bold text-[#FF69B4]">{index}</div>
                 <div className="">{t.task}</div>
-                <button
-                  data-testid="check-button"
-                  className="cursor-pointer"
-                  onClick={() => handleChange(t.id, t.isCompleted)}
-                >
-                  {t.isCompleted ? (
-                    <Check
-                      data-testid="checked-status"
-                      className="text-[#B2FF59]"
-                    />
-                  ) : (
-                    <Square data-testid="unchecked-status" />
-                  )}
-                </button>
+                <div className="flex justify-center items-center gap-5">
+                  <button
+                    data-testid="check-button"
+                    className="cursor-pointer"
+                    onClick={() => handleChange(t.id, t.isCompleted)}
+                  >
+                    {t.isCompleted ? (
+                      <Check
+                        data-testid="checked-status"
+                        className="text-[#B2FF59]"
+                      />
+                    ) : (
+                      <Square data-testid="unchecked-status" />
+                    )}
+                  </button>
+                  <button
+                    className="cursor-pointer"
+                    onClick={() => handleRemove(t.id)}
+                  >
+                    <Trash2 className="text-red-700" />
+                  </button>
+                </div>
               </div>
             );
           })}
-      </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center w-full pt-20">
+          <p className="text-white">No hay tareas</p>
+        </div>
+      )}
     </div>
   );
 };
