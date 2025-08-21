@@ -21,7 +21,7 @@ const Todo = () => {
     const getAllTasks = async () => {
       try {
         const response = await getTasks();
-        if (response) {
+        if (response && response.data) {
           setTasks(response.data);
         }
       } catch (error) {
@@ -68,28 +68,34 @@ const Todo = () => {
           Nueva Tarea
         </button>
       </div>
-      {tasks &&
-        tasks.map((t) => {
-          return (
-            <div
-              key={t.id}
-              className="text-[#F4F6F7] flex justify-between w-full border rounded p-3"
-            >
-              <div className="font-bold text-[#FF69B4]">{t.id}</div>
-              <div className="">{t.task}</div>
-              <button
-                className="cursor-pointer"
-                onClick={() => handleChange(t.id, t.isCompleted)}
+      <div className="w-full flex flex-col gap-2 h-[600px] overflow-y-scroll px-5">
+        {tasks &&
+          tasks.map((t) => {
+            return (
+              <div
+                key={t.id}
+                className="text-[#F4F6F7] flex justify-between w-full border rounded p-3"
               >
-                {t.isCompleted ? (
-                  <Check className="text-[#B2FF59]" />
-                ) : (
-                  <Square />
-                )}
-              </button>
-            </div>
-          );
-        })}
+                <div className="font-bold text-[#FF69B4]">{t.id}</div>
+                <div className="">{t.task}</div>
+                <button
+                  data-testid="check-button"
+                  className="cursor-pointer"
+                  onClick={() => handleChange(t.id, t.isCompleted)}
+                >
+                  {t.isCompleted ? (
+                    <Check
+                      data-testid="checked-status"
+                      className="text-[#B2FF59]"
+                    />
+                  ) : (
+                    <Square data-testid="unchecked-status" />
+                  )}
+                </button>
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 };

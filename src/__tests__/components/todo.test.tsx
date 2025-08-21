@@ -1,5 +1,20 @@
 import Todo from "@/components/Todo";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { createTask, getTasks, updateTask } from "@/api/data";
+
+jest.mock("@/api/data", () => ({
+  createTask: jest.fn(),
+  getTasks: jest.fn(),
+  updateTask: jest.fn(),
+}));
+
+const mockTask = {
+  task: "testing testing",
+};
+
+const mockedCreateTask = createTask as jest.Mock;
+const mockedGetTasks = getTasks as jest.Mock;
+const mockedUpdateTask = updateTask as jest.Mock;
 
 describe("Todo Component", () => {
   it("should render the Todo Component", () => {
@@ -35,32 +50,61 @@ describe("New task button", () => {
 
 describe("Add New Task", () => {
   it("should add a new task", async () => {
+    mockedCreateTask.mockResolvedValue({
+      data: {
+        id: 20,
+        task: mockTask.task,
+        isCompleted: false,
+      },
+    });
+
     render(<Todo />);
+
     const newTaskButton = screen.getByRole("button", { name: /Nueva Tarea/i });
     fireEvent.click(newTaskButton);
 
     const createButton = await screen.findByRole("button", { name: /Crear/i });
     expect(createButton).toBeInTheDocument();
 
-    const mockTask = {
-      task: "testing2",
-    };
-
     const newTaskInput = await screen.findByRole("textbox", { name: "" });
     fireEvent.change(newTaskInput, { target: { value: mockTask.task } });
     fireEvent.click(createButton);
 
-    const taskButton = await screen.findByRole("button", {
-      name: /Nueva Tarea/i,
+    const todoTask = await screen.findByText(`${mockTask.task}`, undefined, {
+      timeout: 2000,
+    }); // getByRole es sincrono, mientras que findByRole es asincrono
+    expect(todoTask).toBeInTheDocument();
+  });
+});
+
+describe("Update a task", () => {
+  it("should update a task status", async () => {
+    mockedGetTasks.mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          task: "task_1",
+          isCompleted: false,
+        },
+      ],
     });
-    expect(taskButton).toBeInTheDocument();
+    render(<Todo />);
 
-    /* const closedFormButton = screen.queryByRole("button", { */
-    /*   name: /Crear/i, */
-    /* }); // query se usa para comprobar si algo existe o no */
-    /* expect(closedFormButton).not.toBeInTheDocument(); */
+    const task = await screen.findByText("task_1");
+    expect(task).toBeInTheDocument();
 
-    /* const todoList = await screen.findByText("test"); // getByRole es sincrono, mientras que findByRole es asincrono */
-    /* expect(todoList).toBeInTheDocument(); */
+    const checkButton = await screen.findByTestId("check-button");
+    expect(checkButton).toBeInTheDocument();
+
+    const uncheckedButton = await screen.findByTestId("unchecked-status");
+    expect(uncheckedButton).toBeInTheDocument();
+
+    const checkedButton = screen.queryByTestId("checked-status");
+    expect(checkedButton).not.toBeInTheDocument();
+
+    fireEvent.click(checkButton);
+
+    const checkedButton2 = await screen.findByTestId("checked-status");
+    expect(checkedButton2).toBeInTheDocument();
   });
 });
