@@ -1,11 +1,20 @@
 import Todo from "@/components/Todo";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { createTask, getTasks, updateTask } from "@/api/data";
+import {
+  fireEvent,
+  render,
+  screen,
+  act,
+  waitFor,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+import { createTask, getTasks, updateTask, deleteTask } from "@/api/data";
 
 jest.mock("@/api/data", () => ({
   createTask: jest.fn(),
   getTasks: jest.fn(),
   updateTask: jest.fn(),
+  deleteTask: jest.fn(),
 }));
 
 const mockTask = {
@@ -15,6 +24,7 @@ const mockTask = {
 const mockedCreateTask = createTask as jest.Mock;
 const mockedGetTasks = getTasks as jest.Mock;
 const mockedUpdateTask = updateTask as jest.Mock;
+const mockedDeleteTask = deleteTask as jest.Mock;
 
 describe("Todo Component", () => {
   it("should render the Todo Component", () => {
@@ -70,15 +80,16 @@ describe("Add New Task", () => {
     fireEvent.change(newTaskInput, { target: { value: mockTask.task } });
     fireEvent.click(createButton);
 
-    const todoTask = await screen.findByText(`${mockTask.task}`, undefined, {
-      timeout: 2000,
-    }); // getByRole es sincrono, mientras que findByRole es asincrono
+    //const todoTask = await screen.findByText(`${mockTask.task}`, undefined, {
+    //  timeout: 2000,
+    //});
+    const todoTask = await screen.findByText(`${mockTask.task}`); // getByRole es sincrono, mientras que findByRole es asincrono
     expect(todoTask).toBeInTheDocument();
   });
 });
 
 describe("Update a task", () => {
-  it("should update a task status", async () => {
+  it("should update a task status when the button is clicked", async () => {
     mockedGetTasks.mockResolvedValue({
       data: [
         {
@@ -102,9 +113,47 @@ describe("Update a task", () => {
     const checkedButton = screen.queryByTestId("checked-status");
     expect(checkedButton).not.toBeInTheDocument();
 
-    fireEvent.click(checkButton);
+    userEvent.click(checkButton);
 
     const checkedButton2 = await screen.findByTestId("checked-status");
     expect(checkedButton2).toBeInTheDocument();
+  });
+});
+
+describe("Remove a task", () => {
+  it("should remove a task when the 'trash' button is clicked", async () => {
+    mockedGetTasks.mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          task: "task_1",
+          isCompleted: false,
+        },
+      ],
+    });
+
+    render(<Todo />);
+
+    const task = await screen.findByText("task_1");
+    expect(task).toBeInTheDocument();
+
+    const deleteButton = await screen.findByTestId("delete-button");
+    expect(deleteButton).toBeInTheDocument();
+
+    // En React cualquier actualizacion de estado tiene que estar dentro de un act
+    // durante los tests.
+    // 'act()' asegura que todas las actualizaciones del estado y del DOM se procesen antes de seguir con los asserts
+    // Alternativa recomendable: userEvent de "@testing-library/user-event"
+    //
+    // await act(async () => {
+    //   fireEvent.click(deleteButton);
+    // });
+
+    userEvent.click(deleteButton);
+
+    await waitFor(() => {
+      const task1 = screen.queryByText("task_1");
+      expect(task1).not.toBeInTheDocument();
+    });
   });
 });

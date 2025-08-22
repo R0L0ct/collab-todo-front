@@ -40,6 +40,8 @@ const NewTask = () => {
       <form onSubmit={handleCreateTask}>
         <input
           type="text"
+          maxLength={80}
+          required
           className="p-3 min-w-[500px]"
           value={task}
           onChange={(e) => setTask(e.target.value)}

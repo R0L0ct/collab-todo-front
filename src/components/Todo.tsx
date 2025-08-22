@@ -33,16 +33,14 @@ const Todo = () => {
 
   const handleChange = async (id: number, checked: boolean) => {
     try {
-      if (tasks) {
-        await updateTask(id, { isCompleted: !checked });
-        const updatedTasks = tasks.map((t) => {
-          if (t.id === id) {
-            return { ...t, isCompleted: !checked };
-          }
-          return t;
-        });
-        setTasks(updatedTasks);
-      }
+      await updateTask(id, { isCompleted: !checked });
+      const updatedTasks = tasks.map((t) => {
+        if (t.id === id) {
+          return { ...t, isCompleted: !checked };
+        }
+        return t;
+      });
+      setTasks(updatedTasks);
     } catch (error) {
       console.log(error);
     }
@@ -79,7 +77,7 @@ const Todo = () => {
         </button>
       </div>
       {tasks.length > 0 ? (
-        <div className="w-full flex flex-col gap-2 h-[600px] overflow-y-scroll px-5">
+        <div className="w-full flex flex-col gap-2 max-h-[600px] overflow-y-auto px-5">
           {tasks.map((t, index) => {
             return (
               <div
@@ -104,6 +102,7 @@ const Todo = () => {
                     )}
                   </button>
                   <button
+                    data-testid="delete-button"
                     className="cursor-pointer"
                     onClick={() => handleRemove(t.id)}
                   >
