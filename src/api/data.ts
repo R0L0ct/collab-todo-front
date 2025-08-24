@@ -42,3 +42,15 @@ export const deleteTask = async (id: number) => {
     console.log(error);
   }
 };
+
+export const register = async (data: {
+  username: string;
+  password: string;
+}) => {
+  try {
+    const response = await axiosInstance.post(`${API}/auth/register`, data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
