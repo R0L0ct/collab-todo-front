@@ -1,16 +1,20 @@
 "use client";
 
-import { register } from "@/api/data";
+import { login } from "@/api/data";
+import { authAtom } from "@/store/store";
+import { useSetAtom } from "jotai";
 import { useState } from "react";
 
-const Register = () => {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const atom = useSetAtom(authAtom);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await register({ username, password });
+      const response = await login({ username, password });
+      atom(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -22,7 +26,7 @@ const Register = () => {
         className="bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
         <h2 className="text-2xl font-semibold text-white mb-6 text-center">
-          Registrarse
+          Iniciar Sesion
         </h2>
 
         <div className="mb-4">
@@ -61,11 +65,11 @@ const Register = () => {
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
         >
-          Enviar
+          Ingresar
         </button>
       </form>
     </div>
   );
 };
 
-export default Register;
+export default Login;

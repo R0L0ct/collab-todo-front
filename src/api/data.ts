@@ -7,9 +7,13 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-export const createTask = async (data: any) => {
+export const createTask = async (data: any, accessToken: any) => {
   try {
-    const response = await axiosInstance.post(`${API}/todo`, data);
+    if (!accessToken) return;
+
+    const response = await axiosInstance.post(`${API}/todo`, data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
     return response;
   } catch (error) {
     console.log(error);
@@ -49,6 +53,15 @@ export const register = async (data: {
 }) => {
   try {
     const response = await axiosInstance.post(`${API}/auth/register`, data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const login = async (data: { username: string; password: string }) => {
+  try {
+    const response = await axiosInstance.post(`${API}/auth/login`, data);
     return response;
   } catch (error) {
     throw error;

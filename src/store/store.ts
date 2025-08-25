@@ -6,5 +6,11 @@ interface TASK {
   isCompleted: boolean;
 }
 
+interface Auth {
+  user: string;
+  access_token: string;
+}
+
 export const taskAtom = atom<boolean>(false);
 export const tasksAtom = atom<TASK[]>([]);
+export const authAtom = atom<Auth | null>(null);

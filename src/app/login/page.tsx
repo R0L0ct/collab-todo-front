@@ -1,9 +1,11 @@
-import Todo from "@/components/Todo";
+import Login from "@/components/Login";
 
-export default function Home() {
+const page = () => {
   return (
     <div className="min-h-[calc(100vh-50px)] flex justify-center bg-[#1A1A1A]">
-      <Todo />
+      <Login />
     </div>
   );
-}
+};
+
+export default page;

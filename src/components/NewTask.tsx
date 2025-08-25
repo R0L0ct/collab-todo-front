@@ -1,8 +1,8 @@
 "use client";
 
 import { createTask } from "@/api/data";
-import { taskAtom, tasksAtom } from "@/store/store";
-import { useAtom, useSetAtom } from "jotai";
+import { authAtom, taskAtom, tasksAtom } from "@/store/store";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 
 interface TASK {
@@ -15,12 +15,15 @@ const NewTask = () => {
   const [task, setTask] = useState<string>("");
   const setTaskAtom = useSetAtom(taskAtom);
   const [tasks, setNewTask] = useAtom<TASK[]>(tasksAtom);
+  const authAtomValue = useAtomValue(authAtom);
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!authAtomValue?.access_token) return;
+
       const data = { task: task };
-      const response = await createTask(data);
+      const response = await createTask(data, authAtomValue.access_token);
       if (response) {
         setTaskAtom(false);
         const newTask = {
