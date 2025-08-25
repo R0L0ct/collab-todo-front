@@ -22,7 +22,7 @@ const NewTask = () => {
     try {
       if (!authAtomValue?.access_token) return;
 
-      const data = { task: task };
+      const data = { task: task, userId: authAtomValue.user.userId };
       const response = await createTask(data, authAtomValue.access_token);
       if (response) {
         setTaskAtom(false);

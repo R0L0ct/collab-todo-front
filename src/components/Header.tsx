@@ -12,7 +12,9 @@ const Header = () => {
       </Link>
 
       {atom?.user ? (
-        <p className="text-white text-l font-bold">{atom.user.toUpperCase()}</p>
+        <p className="text-white text-l font-bold">
+          {atom.user.username.toUpperCase()}
+        </p>
       ) : (
         <nav className="flex gap-6">
           <Link

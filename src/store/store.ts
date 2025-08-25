@@ -7,7 +7,7 @@ interface TASK {
 }
 
 interface Auth {
-  user: string;
+  user: { username: string; userId: number };
   access_token: string;
 }
 

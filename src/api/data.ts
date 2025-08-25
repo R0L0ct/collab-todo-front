@@ -67,3 +67,12 @@ export const login = async (data: { username: string; password: string }) => {
     throw error;
   }
 };
+
+export const refreshAccessToken = async () => {
+  try {
+    const response = await axiosInstance.get(`${API}/auth/refresh-token`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
