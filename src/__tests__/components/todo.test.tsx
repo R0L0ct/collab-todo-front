@@ -1,14 +1,11 @@
 import Todo from "@/components/Todo";
-import {
-  fireEvent,
-  render,
-  screen,
-  act,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { createTask, getTasks, updateTask, deleteTask } from "@/api/data";
+import { Provider, useSetAtom } from "jotai";
+import { authAtom } from "@/store/store";
+import { useEffect } from "react";
 
 jest.mock("@/api/data", () => ({
   createTask: jest.fn(),
@@ -19,6 +16,25 @@ jest.mock("@/api/data", () => ({
 
 const mockTask = {
   task: "testing testing",
+};
+
+const SetAuthAtomWrapper = ({
+  user,
+  accessToken,
+}: {
+  user: { username: string; userId: number };
+  accessToken: string;
+}) => {
+  const setAuthAtom = useSetAtom(authAtom);
+
+  useEffect(() => {
+    setAuthAtom({
+      user,
+      access_token: accessToken,
+    });
+  }, [setAuthAtom, user, accessToken]);
+
+  return null;
 };
 
 const mockedCreateTask = createTask as jest.Mock;
@@ -65,26 +81,38 @@ describe("Add New Task", () => {
         id: 20,
         task: mockTask.task,
         isCompleted: false,
+        user: { username: "test-user" },
       },
     });
 
-    render(<Todo />);
+    render(
+      <Provider>
+        <SetAuthAtomWrapper
+          user={{ username: "test-user", userId: 1 }}
+          accessToken="fake_token"
+        />
+        <Todo />
+      </Provider>,
+    );
 
     const newTaskButton = screen.getByRole("button", { name: /Nueva Tarea/i });
-    fireEvent.click(newTaskButton);
+    await userEvent.click(newTaskButton);
 
     const createButton = await screen.findByRole("button", { name: /Crear/i });
     expect(createButton).toBeInTheDocument();
 
     const newTaskInput = await screen.findByRole("textbox", { name: "" });
-    fireEvent.change(newTaskInput, { target: { value: mockTask.task } });
-    fireEvent.click(createButton);
+    await userEvent.type(newTaskInput, mockTask.task);
+    await userEvent.click(createButton);
 
     //const todoTask = await screen.findByText(`${mockTask.task}`, undefined, {
     //  timeout: 2000,
     //});
     const todoTask = await screen.findByText(`${mockTask.task}`); // getByRole es sincrono, mientras que findByRole es asincrono
     expect(todoTask).toBeInTheDocument();
+
+    const todoTaskUser = await screen.findByText("test-user");
+    expect(todoTaskUser).toBeInTheDocument();
   });
 });
 

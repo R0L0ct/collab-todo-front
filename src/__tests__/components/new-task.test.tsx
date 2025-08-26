@@ -1,5 +1,6 @@
 import NewTask from "@/components/NewTask";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 describe("New task form", () => {
   it("should change the new task input value", async () => {
@@ -10,9 +11,9 @@ describe("New task form", () => {
     };
 
     const formInput = screen.getByRole("textbox", { name: "" });
-    fireEvent.change(formInput, {
-      target: { value: mockTask.task },
-    });
+
+    await userEvent.type(formInput, mockTask.task);
+
     expect(formInput).toHaveValue(mockTask.task);
   });
 });

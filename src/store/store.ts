@@ -4,6 +4,7 @@ interface TASK {
   id: number;
   task: string;
   isCompleted: boolean;
+  user: { username: string };
 }
 
 interface Auth {

@@ -9,6 +9,7 @@ interface TASK {
   id: number;
   task: string;
   isCompleted: boolean;
+  user: { username: string };
 }
 
 const NewTask = () => {
@@ -30,6 +31,7 @@ const NewTask = () => {
           id: response.data.id,
           task: response.data.task,
           isCompleted: response.data.isCompleted,
+          user: { username: response.data.user.username },
         };
         const newTaskArray = [...tasks, newTask];
         setNewTask(newTaskArray);

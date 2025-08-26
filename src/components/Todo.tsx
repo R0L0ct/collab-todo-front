@@ -23,7 +23,6 @@ const Todo = () => {
         const response = await getTasks();
         if (response && response.data) {
           setTasks(response.data);
-          console.log(response.data);
         }
       } catch (error) {
         console.log(error);
@@ -85,8 +84,10 @@ const Todo = () => {
                 key={t.id}
                 className="text-[#F4F6F7] flex justify-between w-full border rounded p-3"
               >
-                <div className="font-bold text-[#FF69B4]">{index}</div>
-                <div className="text-white">{t.user?.username}</div>
+                <div className="flex items-center gap-3">
+                  <div className="font-bold text-[#FF69B4] min-w-[20px]">{index}</div>
+                  <div className="text-white font-bold">{t.user?.username}</div>
+                </div>
                 <div className="">{t.task}</div>
                 <div className="flex justify-center items-center gap-5">
                   <button
