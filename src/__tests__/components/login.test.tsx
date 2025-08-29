@@ -1,4 +1,5 @@
 import { login } from "@/api/data";
+import Header from "@/components/Header";
 import Login from "@/components/Login";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -18,48 +19,39 @@ describe("Login form", () => {
 
   it("should change the inputs values", async () => {
     render(<Login />);
-    const usernameLabel = screen.getByText(/username/i);
-    const usernameContainer = usernameLabel.closest("div");
-    const usernameInput = usernameContainer?.querySelector("input");
+    const usernameInput = screen.getByLabelText(/username/i);
     expect(usernameInput).toBeInTheDocument();
 
-    const passwordLabel = screen.getByText(/password/i);
-    const passwordContainer = passwordLabel.closest("div");
-    const passwordInput = passwordContainer?.querySelector("input");
+    const passwordInput = screen.getByLabelText(/password/i);
     expect(passwordInput).toBeInTheDocument();
-
-    if (!usernameInput) throw new Error("usernameInput error");
-    if (!passwordInput) throw new Error("passwordInput error");
 
     await userEvent.type(usernameInput, "test-user");
     await userEvent.type(passwordInput, "test123");
+
     expect(usernameInput).toHaveValue("test-user");
     expect(passwordInput).toHaveValue("test123");
   });
 
-  it("should login correctly when the submit button is clicked", async () => {
+  it("should login correctly when the submit button is clicked & show the username in the header", async () => {
     mockedLogin.mockResolvedValue({
       data: {
         user: { username: "test-user", userId: 1 },
         access_token: "fake_token",
       },
     });
+
+    render(<Header />);
     render(<Login />);
-    const usernameLabel = screen.getByText(/username/i);
-    const usernameContainer = usernameLabel.closest("div");
-    const usernameInput = usernameContainer?.querySelector("input");
+
+    const usernameInput = screen.getByLabelText(/username/i);
     expect(usernameInput).toBeInTheDocument();
 
-    const passwordLabel = screen.getByText(/password/i);
-    const passwordContainer = passwordLabel.closest("div");
-    const passwordInput = passwordContainer?.querySelector("input");
+    const passwordInput = screen.getByLabelText(/password/i);
     expect(passwordInput).toBeInTheDocument();
-
-    if (!usernameInput) throw new Error("usernameInput error");
-    if (!passwordInput) throw new Error("passwordInput error");
 
     await userEvent.type(usernameInput, "test-user");
     await userEvent.type(passwordInput, "test123");
+
     expect(usernameInput).toHaveValue("test-user");
     expect(passwordInput).toHaveValue("test123");
 
@@ -71,5 +63,9 @@ describe("Login form", () => {
       username: "test-user",
       password: "test123",
     });
+    expect(login).toHaveBeenCalledTimes(1);
+
+    const usernameHeader = await screen.findByText(/test-user/i);
+    expect(usernameHeader).toBeInTheDocument();
   });
 });
